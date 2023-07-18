@@ -50,7 +50,7 @@ namespace RABBITMQ_TUTORIAL.Service
                 "x-queue-master-locator" (string): Kuyruk kümesi (cluster) senaryolarında, kuyruğun ana düğümünü belirtir. "min-masters" olarak ayarlandığında, kuyruk en az sayıda ana düğümde oluşturulur.
 
 
-                2-ARGUMENTS Kullanım:
+                2-ARGUMENTS Kullanım: 
 
                 var arguments = new Dictionary<string, object>
                 {
@@ -92,6 +92,105 @@ namespace RABBITMQ_TUTORIAL.Service
             }
         }
 
+        public void ProduceSpecialMessageWithUserId(int userId, string queueName, string message)
+        {
+
+
+            using (var channel = _connection.CreateModel())
+            {
+                // Kuyruk oluşturma (varsa tekrar oluşturmaz)
+
+                /*
+                 
+                 durable (dayanıklılık) özelliği, RabbitMQ'da kuyrukların kalıcı olup olmadığını belirler.
+                 Bir kuyruk dayanıklı (durable = true) olarak tanımlandığında, kuyruk mesajları fiziksel olarak diskte saklanır ve sunucu yeniden başlatıldığında bile kuyruk ve mesajlar korunur.
+                 Eğer durable = false olarak tanımlanırsa, kuyruk geçici olur ve sunucu yeniden başlatıldığında kuyruk ve mesajlar kaybolabilir.
+                 
+                 */
+
+                channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                // PDF içeriğini byte dizisine dönüştür
+                byte[] pdfBytes = Encoding.UTF8.GetBytes(message);
+
+                // Kullanıcı kimliğini header'a ekleyerek mesajı kuyruğa ekle
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true; // Mesajların kalıcı olması için
+                properties.Headers = new System.Collections.Generic.Dictionary<string, object>
+                {
+                    { "user_id", userId.ToString() }
+                };
+
+                channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: pdfBytes);
+            }
+        }
+
+        public void ConsomeSpecialMessageWithUserId(int user_id, string queueName)
+        {
+
+            using (var channel = _connection.CreateModel())
+            {
+
+                // Kullanıcıya özel mesajı tüketme işlemi
+                // Kullanıcı kimliği "user_id" değişkeniyle temsil ediliyor.
+                // Kullanıcının sadece kendi verilerini tüketmesini sağlamak için kullanıcı kimliğiyle mesajları filtreleyeceğiz.
+
+
+                /*
+                 
+                - BasicQos(0, 1, false) PARAMETRELERİ ;
+
+                prefetchSize (uint): Bu parametre, bir mesajın maksimum boyutunu belirtir. Yani, bu boyutu aşan bir mesaj alındığında bu mesajın tüketiciye verilmesi engellenir.
+                                     Genellikle bu değer 0 olarak ayarlanır, bu da mesaj boyutunun önemsiz olduğu anlamına gelir ve mesaj boyutu kontrolü yapılmaz.
+                                     (200 * 1024; // 200 KB)
+
+                prefetchCount (ushort): Bu parametre, tüketiciye eşzamanlı olarak kaç mesajın verileceğini belirtir.
+                                        Örneğin, prefetchCount değeri 1 olarak ayarlanırsa, tüketiciye sırayla yalnızca bir mesaj gönderilir ve o mesaj işlenene kadar diğer mesajlar tüketiciye gönderilmez.
+
+                global (bool): Bu parametre, tüketici için prefetchCount değerinin kümesinin, kanal (channel) düzeyinde mi yoksa tüketici (consumer) düzeyinde mi kullanılacağını belirler.
+                               Eğer global değeri true olarak ayarlanırsa, tüm tüketicilere aynı prefetchCount değeri uygulanır.
+                               Eğer false olarak ayarlanırsa, her tüketiciye ayrı bir prefetchCount değeri uygulanır.
+                 
+                 */
+
+                channel.BasicQos(0, 1, false);
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    // Mesajın kullanıcıya ait olduğunu doğrulayalım
+                    if (ea.BasicProperties.Headers.TryGetValue("user_id", out object userIdObj))
+                    {
+                        int userId = Convert.ToInt32(Encoding.UTF8.GetString((byte[])userIdObj));
+                        if (userId == user_id)
+                        {
+                            var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                            Console.WriteLine("Kişisel message tüketildi : " + message);
+
+                            /*
+                             
+                            BasicAck metodunun multiple parametresi, mesajları topluca onaylamak için kullanılır.
+                            Bu parametre, true olarak ayarlandığında, belirtilen deliveryTag değerinden küçük veya eşit olan tüm mesajlar onaylanır.
+                            Yani, multiple değeri true olarak ayarlandığında, belirtilen deliveryTag'den önceki tüm mesajlar başarıyla işlendi olarak kabul edilir
+                            ve kuyruktan çıkarılır.
+                             
+                             */
+
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                        }
+                    }
+                };
+
+                // Kuyruğu dinleme
+                channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+
+                Console.WriteLine("Kullanıcıya özel mesajları tüketmek için bekleniyor...");
+                Console.ReadLine();
+            }
+
+
+
+        }
+
         public List<string> GetMessagesFromQueue(string queueName)
         {
             var messages = new List<string>();
@@ -121,8 +220,6 @@ namespace RABBITMQ_TUTORIAL.Service
             var queueDeclareOk = channel.QueueDeclarePassive(queueName);
             return (int)queueDeclareOk.MessageCount;
         }
-
-
 
 
         //Belirtilen bir exchange oluşturur.

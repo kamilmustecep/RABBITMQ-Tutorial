@@ -6,7 +6,13 @@ var serviceProvider = new ServiceCollection()
                 .BuildServiceProvider();
 
 var consumer = serviceProvider.GetService<IRabbitMQConsumer>();
-consumer.StartConsuming("Kuyruk37");
+
+
+//Personel queue consuming
+consumer.ConsomeSpecialMessageWithUserId(37,"Kuyruk37");
+
+//General queue consuming
+//consumer.StartConsuming("Kuyruk37");
 
 Console.WriteLine("RabbitMQ Consumer is listening. Press any key to exit.");
 Console.ReadKey();

@@ -10,5 +10,6 @@ namespace RABBITMQ_TUTORIAL.CONSUMER.Services
     {
         void StartConsuming(string queueName);
         void StopConsuming();
+        void ConsomeSpecialMessageWithUserId(int user_id, string queueName);
     }
 }

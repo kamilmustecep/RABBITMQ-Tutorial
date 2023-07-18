@@ -21,13 +21,16 @@ namespace RABBITMQ_TUTORIAL.Controllers
 
         public IActionResult Index()
         {
+
             for (int i = 0; i < 10; i++)
             {
-                _rabbitMQService.PublishMessage("Kuyruk37", i+". mesaj");
+                _rabbitMQService.PublishMessage("Kuyruk37", i+". Genel mesaj başlıksız");
+                _rabbitMQService.ProduceSpecialMessageWithUserId(37,"Kuyruk37", "37 idli kullanıcı mesajı");
+                _rabbitMQService.ProduceSpecialMessageWithUserId(45, "Kuyruk37", "45 idli kullanıcı mesajı");
 
-                Thread.Sleep(2000);
+                Thread.Sleep(3000);
             }
-            
+
             return View();
         }
        

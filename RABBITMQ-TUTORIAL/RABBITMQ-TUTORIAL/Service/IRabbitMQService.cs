@@ -6,6 +6,10 @@ namespace RABBITMQ_TUTORIAL.Service
     {
         void PublishMessage(string queueName, string message);
 
+        void ProduceSpecialMessageWithUserId(int userId, string queueName, string message);
+
+        void ConsomeSpecialMessageWithUserId(int user_id, string queueName);
+
         List<string> GetMessagesFromQueue(string queueName);
 
         int GetMessageCount(IModel channel, string queueName);

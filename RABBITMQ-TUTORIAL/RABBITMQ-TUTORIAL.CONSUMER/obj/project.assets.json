@@ -37,6 +37,19 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
+      "Newtonsoft.Json/13.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "RabbitMQ.Client/6.5.0": {
         "type": "package",
         "dependencies": {
@@ -78,6 +91,23 @@
         "build": {
           "buildTransitive/net6.0/_._": {}
         }
+      },
+      "RABBITMQ-TUTORIAL/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3",
+          "RabbitMQ.Client": "6.5.0"
+        },
+        "compile": {
+          "bin/placeholder/RABBITMQ-TUTORIAL.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/RABBITMQ-TUTORIAL.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },
@@ -138,6 +168,36 @@
         "microsoft.extensions.dependencyinjection.abstractions.7.0.0.nupkg.sha512",
         "microsoft.extensions.dependencyinjection.abstractions.nuspec",
         "useSharedDesignerContext.txt"
+      ]
+    },
+    "Newtonsoft.Json/13.0.3": {
+      "sha512": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "type": "package",
+      "path": "newtonsoft.json/13.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "README.md",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/net6.0/Newtonsoft.Json.dll",
+        "lib/net6.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.0/Newtonsoft.Json.dll",
+        "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.3/Newtonsoft.Json.dll",
+        "lib/netstandard1.3/Newtonsoft.Json.xml",
+        "lib/netstandard2.0/Newtonsoft.Json.dll",
+        "lib/netstandard2.0/Newtonsoft.Json.xml",
+        "newtonsoft.json.13.0.3.nupkg.sha512",
+        "newtonsoft.json.nuspec",
+        "packageIcon.png"
       ]
     },
     "RabbitMQ.Client/6.5.0": {
@@ -207,11 +267,17 @@
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "RABBITMQ-TUTORIAL/1.0.0": {
+      "type": "project",
+      "path": "../RABBITMQ-TUTORIAL/RABBITMQ-TUTORIAL.csproj",
+      "msbuildProject": "../RABBITMQ-TUTORIAL/RABBITMQ-TUTORIAL.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net7.0": [
       "Microsoft.Extensions.DependencyInjection >= 7.0.0",
+      "RABBITMQ-TUTORIAL >= 1.0.0",
       "RabbitMQ.Client >= 6.5.0"
     ]
   },
@@ -241,7 +307,11 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\kamil.mustecep\\source\\repos\\RABBITMQ-TUTORIAL\\RABBITMQ-TUTORIAL\\RABBITMQ-TUTORIAL.csproj": {
+              "projectPath": "C:\\Users\\kamil.mustecep\\source\\repos\\RABBITMQ-TUTORIAL\\RABBITMQ-TUTORIAL\\RABBITMQ-TUTORIAL.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
